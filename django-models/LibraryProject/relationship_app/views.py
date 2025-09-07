@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from django.views.generic import DetailView
-from .models import Book, Library  # <- This fixes the missing import
+from .models import Book, Library, Library  # <- This fixes the missing import
 
 def list_books(request):
     books = Book.objects.all()
