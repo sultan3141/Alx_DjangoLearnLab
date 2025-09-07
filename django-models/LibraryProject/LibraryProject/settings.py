@@ -130,3 +130,5 @@ CSRF_TRUSTED_ORIGINS = [
     "https://127.0.0.1:8000",
 ]
 
+os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'LibraryProject.settings')
+django.setup()
