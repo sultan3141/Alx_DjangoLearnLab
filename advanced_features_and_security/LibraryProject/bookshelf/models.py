@@ -38,7 +38,7 @@ class CustomUserManager(BaseUserManager):
 
 
 # ---------- Custom User Model ----------
-class CustomUser(AbstractUser):
+'''class CustomUser(AbstractUser):
     username = None  # Remove username field (we'll use email instead)
     email = models.EmailField(unique=True)
 
@@ -52,3 +52,14 @@ class CustomUser(AbstractUser):
 
     def __str__(self):
         return self.email
+'''
+
+class CustomUser(AbstractUser):
+    date_of_birth = models.DateField(null=True, blank=True)
+    profile_photo = models.ImageField(upload_to="profile_photos/", null=True, blank=True)
+
+    class Meta:
+        permissions = (
+            ("can_create", "Can create user"),
+            ("can_delete", "Can delete user"),
+        )
