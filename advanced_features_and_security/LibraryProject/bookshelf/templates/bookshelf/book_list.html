@@ -1,0 +1,11 @@
+{% extends "base.html" %}
+{% block content %}
+  <h2>Book List</h2>
+  <ul>
+    {% for book in books %}
+      <li>{{ book.title|escape }} — {{ book.author|escape }}</li>
+    {% empty %}
+      <li>No books available.</li>
+    {% endfor %}
+  </ul>
+{% endblock %}

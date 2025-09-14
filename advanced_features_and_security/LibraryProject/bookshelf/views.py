@@ -46,3 +46,23 @@ def delete_book(request, book_id):
     book = get_object_or_404(Book, id=book_id)
     book.delete()
     return redirect("book_list")
+
+# LibraryProject/bookshelf/views.py
+from django.shortcuts import render, redirect
+from .forms import ExampleForm   # <-- make sure this import is here
+
+def example_form_view(request):
+    """Handles ExampleForm submissions securely."""
+    if request.method == "POST":
+        form = ExampleForm(request.POST)
+        if form.is_valid():
+            # process form data safely
+            name = form.cleaned_data['name']
+            email = form.cleaned_data['email']
+            message = form.cleaned_data['message']
+            # TODO: save or process the data
+            return redirect('bookshelf:book_list')
+    else:
+        form = ExampleForm()
+
+    return render(request, "bookshelf/form_example.html", {"form": form})
