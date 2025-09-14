@@ -144,3 +144,4 @@ SECURE_SSL_REDIRECT = True
 # Custom User Model
 # ----------------------------
 AUTH_USER_MODEL = "bookshelf.CustomUser"
+SECURE_PROXY_SSL_HEADER = ('HTTP_X_FORWARDED_PROTO', 'https')
