@@ -1,0 +1,17 @@
+{
+  "name": "Django + PostgreSQL",
+  "image": "mcr.microsoft.com/devcontainers/python:3.12",
+
+  "features": {
+    "ghcr.io/devcontainers/features/postgres:1": {
+      "version": "16",
+      "password": "postgres"
+    }
+  },
+
+  "postCreateCommand": "pip install -r requirements.txt",
+
+  "forwardPorts": [5432],
+
+  "remoteUser": "vscode"
+}
