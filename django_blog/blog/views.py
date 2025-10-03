@@ -10,8 +10,9 @@ from .forms import CustomUserCreationForm, UserUpdateForm, PostForm, CommentForm
 from .models import Post, Comment
 
 from django.db.models import Q
-from django.shortcuts import render
 from .models import Post
+from taggit.models import Tag
+from django.shortcuts import get_object_or_404
 
 def search(request):
     query = request.GET.get("q", "")
