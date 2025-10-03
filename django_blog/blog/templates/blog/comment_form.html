@@ -1,0 +1,8 @@
+<!-- blog/templates/blog/comment_form.html -->
+<h2>Edit your comment</h2>
+<form method="post">
+  {% csrf_token %}
+  {{ form.as_p }}
+  <button type="submit">Save</button>
+  <a href="{% url 'post_detail' object.post.pk %}">Cancel</a>
+</form>
