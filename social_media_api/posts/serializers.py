@@ -28,3 +28,7 @@ class PostSerializer(serializers.ModelSerializer):
     def create(self, validated_data):
         request = self.context.get("request")
         return Post.objects.create(author=request.user, **validated_data)
+
+class FollowSerializer(serializers.Serializer):
+    target_user_id = serializers.IntegerField()
+    

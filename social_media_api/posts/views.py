@@ -4,6 +4,7 @@ from rest_framework.exceptions import PermissionDenied
 from .models import Post, Comment
 from .serializers import PostSerializer, CommentSerializer
 from rest_framework import filters
+from rest_framework import generics, permissions
 
 class IsOwnerOrReadOnly:
     """
@@ -53,3 +54,16 @@ class CommentViewSet(viewsets.ModelViewSet):
         if self.action in ("update", "partial_update", "destroy"):
             return [IsAuthenticated(), IsOwnerOrReadOnly()]
         return super().get_permissions()
+
+
+class FeedView(generics.ListAPIView):
+    serializer_class = PostSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def get_queryset(self):
+        user = self.request.user
+        # users this user follows
+        following_users = user.following.all()
+        # posts authored by those users
+        qs = Post.objects.filter(author__in=following_users).order_by("-created_at")
+        return qs
