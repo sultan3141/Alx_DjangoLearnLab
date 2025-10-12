@@ -1,10 +1,14 @@
 from rest_framework import viewsets
 from rest_framework.permissions import IsAuthenticated, IsAuthenticatedOrReadOnly
 from rest_framework.exceptions import PermissionDenied
-from .models import Post, Comment
-from .serializers import PostSerializer, CommentSerializer
+from .models import Post, Comment, Like
+from .serializers import PostSerializer, CommentSerializer, LikeSerializer
 from rest_framework import filters
-from rest_framework import generics, permissions
+from rest_framework import generics, permissions, status
+from rest_framework.response import Response
+from django.shortcuts import get_object_or_404
+from notifications.utils import create_notification
+from django.conf import settings
 
 class IsOwnerOrReadOnly:
     """
@@ -67,3 +71,42 @@ class FeedView(generics.ListAPIView):
         # posts authored by those users
         qs = Post.objects.filter(author__in=following_users).order_by("-created_at")
         return qs
+
+class LikePostView(generics.GenericAPIView):
+    """
+    POST to like a post. Requires authentication.
+    """
+    serializer_class = LikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        user = request.user
+        post = get_object_or_404(Post, pk=pk)
+
+        # Prevent liking twice
+        like_exists = Like.objects.filter(user=user, post=post).exists()
+        if like_exists:
+            return Response({"detail": "You have already liked this post."}, status=status.HTTP_400_BAD_REQUEST)
+
+        like = Like.objects.create(user=user, post=post)
+        # Create notification: recipient is the post owner
+        create_notification(recipient=post.author, actor=user, verb="liked your post", target=post)
+        return Response(LikeSerializer(like).data, status=status.HTTP_201_CREATED)
+
+class UnlikePostView(generics.GenericAPIView):
+    """
+    POST to unlike a post. Requires authentication.
+    """
+    serializer_class = LikeSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
+    def post(self, request, pk):
+        user = request.user
+        post = get_object_or_404(Post, pk=pk)
+        like_qs = Like.objects.filter(user=user, post=post)
+        if not like_qs.exists():
+            return Response({"detail": "Like does not exist."}, status=status.HTTP_400_BAD_REQUEST)
+        like_qs.delete()
+        # Optionally, remove related notifications or mark them read — here we keep notifications as history.
+        return Response({"detail": "Unliked"}, status=status.HTTP_200_OK)
+
