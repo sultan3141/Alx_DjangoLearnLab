@@ -10,6 +10,7 @@ from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 User = get_user_model()
 
 
+# 🔹 Register new user
 class RegisterView(generics.CreateAPIView):
     serializer_class = RegisterSerializer
     permission_classes = [permissions.AllowAny]
@@ -25,36 +26,42 @@ class RegisterView(generics.CreateAPIView):
         }, status=status.HTTP_201_CREATED)
 
 
-class LoginView(APIView):
-    permission_classes = [permissions.AllowAny]
+# 🔹 Login user
+class LoginView(generics.GenericAPIView):
     serializer_class = LoginSerializer
+    permission_classes = [permissions.AllowAny]
 
     def post(self, request):
-        serializer = self.serializer_class(data=request.data)
+        serializer = self.get_serializer(data=request.data)
         serializer.is_valid(raise_exception=True)
         user = serializer.validated_data["user"]
         token, _ = Token.objects.get_or_create(user=user)
         return Response({
             "user": UserSerializer(user).data,
             "token": token.key,
-        })
+        }, status=status.HTTP_200_OK)
 
 
-class ProfileView(APIView):
+# 🔹 View & Update Profile
+class ProfileView(generics.GenericAPIView):
+    serializer_class = UserSerializer
+    permission_classes = [permissions.IsAuthenticated]
+
     def get(self, request):
-        user = request.user
-        serializer = UserSerializer(user)
+        serializer = self.get_serializer(request.user)
         return Response(serializer.data)
 
     def put(self, request):
-        user = request.user
-        serializer = UserSerializer(user, data=request.data, partial=True)
+        serializer = self.get_serializer(request.user, data=request.data, partial=True)
         serializer.is_valid(raise_exception=True)
         serializer.save()
         return Response(serializer.data)
 
 
-class FollowUserView(APIView):
+# 🔹 Follow another user
+class FollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, user_id):
         user_to_follow = get_object_or_404(CustomUser, id=user_id)
         if user_to_follow == request.user:
@@ -65,7 +72,10 @@ class FollowUserView(APIView):
                         status=status.HTTP_200_OK)
 
 
-class UnfollowUserView(APIView):
+# 🔹 Unfollow a user
+class UnfollowUserView(generics.GenericAPIView):
+    permission_classes = [permissions.IsAuthenticated]
+
     def post(self, request, user_id):
         user_to_unfollow = get_object_or_404(CustomUser, id=user_id)
         if user_to_unfollow == request.user:
@@ -79,17 +89,17 @@ class UnfollowUserView(APIView):
 # 🔹 List all users except the current one
 class UserListView(generics.ListAPIView):
     serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
         user = self.request.user
         return CustomUser.objects.all().exclude(id=user.id)
 
 
-# 🔹 Retrieve a single user by ID
+# 🔹 Retrieve single user by ID
 class UserDetailView(generics.RetrieveAPIView):
     serializer_class = UserSerializer
-    permission_classes = [permissions.AllowAny]
+    permission_classes = [permissions.IsAuthenticated]
     lookup_field = "id"
 
     def get_queryset(self):
