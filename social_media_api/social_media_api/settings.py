@@ -25,7 +25,12 @@ SECRET_KEY = "django-insecure-f+s9vm-q!(^xf7)4fj5by%6p65m=^x7hpqjt^j*slm%6&rp0#8
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "alx-djangolearnlab1.onrender.com",
+]
+
 
 
 # Application definition
