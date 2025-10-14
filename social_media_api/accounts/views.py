@@ -9,6 +9,7 @@ from .serializers import RegisterSerializer, LoginSerializer, UserSerializer
 from notifications.utils import create_notification
 
 
+
 User = get_user_model()
 
 
