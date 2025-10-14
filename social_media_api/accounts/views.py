@@ -107,3 +107,8 @@ class UserDetailView(generics.RetrieveAPIView):
 
     def get_queryset(self):
         return CustomUser.objects.all()
+
+from django.http import HttpResponse
+
+def accounts_home(request):
+    return HttpResponse("Welcome to Accounts! Go to /login/ or /register/")

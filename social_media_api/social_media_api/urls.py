@@ -24,7 +24,7 @@ urlpatterns = [
     path("accounts/", include("accounts.urls")),
     path("posts/", include("posts.urls")),
     path("notifications/", include("notifications.urls")),
-    path("", RedirectView.as_view(url="/accounts/", permanent=False)),  # 👈 redirect root
+    path("", RedirectView.as_view(url="/accounts/login/", permanent=False)),  # 👈 redirect root
 ]
 
 
